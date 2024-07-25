@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacokinetics Compartmental Model Simulation and Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        .navbar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #4CAF50;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .navbar button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: white;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .navbar button:hover {
+            background-color: #ac4caf;
+            color: rgb(255, 255, 255);
+        }
+        .container {
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 80%;
+            max-width: 1000px;
+            margin-bottom: 20px;
+            background-color: #e6e4e4;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .input-container label {
+            flex: 1;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .input-container input {
+            flex: 2;
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-container span {
+            flex: 0.5;
+            text-align: right;
+        }
+        #plot {
+            width: 80%;
+            height: 500px;
+            margin-top: 20px;
+        }
+        .plot-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        button.plot-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button.plot-button:hover {
+            background-color: #ac4caf;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pharmacokinetics Compartmental Model Simulation and Graph</h1>
+    <div class="navbar">
+        <button onclick="showContainer('one-compartment-iv-bolus')">IV Bolus One-Compartment</button>
+        <button onclick="showContainer('one-compartment-iv-infusion')">IV Infusion One-Compartment</button>
+        <button onclick="showContainer('one-compartment-extravascular')">Extravascular One-Compartment</button>
+        <button onclick="showContainer('two-compartment-iv-bolus')">IV Bolus Two-Compartment</button>
+        <button onclick="showContainer('two-compartment-iv-infusion')">IV Infusion Two-Compartment</button>
+        <button onclick="showContainer('two-compartment-extravascular')">Extravascular Two-Compartment</button>
+    </div>
+
+    <!-- One-Compartment IV Bolus Model -->
+    <div id="one-compartment-iv-bolus" class="container">
+        <h2>IV Bolus One-Compartment Model</h2>
+        <div class="input-container">
+            <label for="iv-bolus-dose">Dose (D):</label>
+            <input type="number" id="iv-bolus-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus-interval">Dosing Interval (τ):</label>
+            <input type="number" id="iv-bolus-interval" step="any">
+            <span>h</h1></h1></span>    
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus-doses">Number of Doses (n):</label>
+            <input type="number" id="iv-bolus-doses" step="any">
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus-k">Elimination Rate Constant (k):</label>
+            <input type="number" id="iv-bolus-k" step="any">
+            <span>h<sup>-1</sup></span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus-v">Volume of Distribution (V):</label>
+            <input type="number" id="iv-bolus-v" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus-time">Time Range (t):</label>
+            <input type="number" id="iv-bolus-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotOneCompartmentIVBolus()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="iv-bolus-plot" class="plot-container"></div>
+    </div>
+
+    <!-- One-Compartment IV Infusion Model -->
+    <div id="one-compartment-iv-infusion" class="container">
+        <h2>IV Infusion One-Compartment Model</h2>
+        <div class="input-container">
+            <label for="iv-infusion-dose">Dose (D):</label>
+            <input type="number" id="iv-infusion-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion-time">Infusion Time (T<sub>inf</sub>):</label>
+            <input type="number" id="iv-infusion-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion-interval">Dosing Interval (τ):</label>
+            <input type="number" id="iv-infusion-interval" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion-doses">Number of Doses (n):</label>
+            <input type="number" id="iv-infusion-doses" step="any">
+        </div>
+
+        <div class="input-container">
+            <label for="iv-infusion-k">Elimination Rate Constant (k):</label>
+            <input type="number" id="iv-infusion-k" step="any">
+            <span>h<sup>-1</sup></span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion-v">Volume of Distribution (V):</label>
+            <input type="number" id="iv-infusion-v" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion-range">Time Range (t):</label>
+            <input type="number" id="iv-infusion-range" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotOneCompartmentIVInfusion()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="iv-infusion-plot" class="plot-container"></div>
+    </div>
+
+    <!-- Extravascular One-Compartment Model -->
+    <div id="one-compartment-extravascular" class="container">
+        <h2>Extravascular One-Compartment Model</h2>
+        <div class="input-container">
+            <label for="ev-dose">Dose (D):</label>
+            <input type="number" id="ev-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="ev-interval">Dosing Interval (τ):</label>
+            <input type="number" id="ev-interval" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="ev-doses">Number of Doses (n):</label>
+            <input type="number" id="ev-doses" step="any">
+        </div>
+        <div class="input-container">
+            <label for="ev-ka">Absorption Rate Constant (k<sub>a</sub>):</label>
+            <input type="number" id="ev-ka" step="any">
+            <span>h<sup>-1</sup></span>
+        </div>
+        <div class="input-container">
+            <label for="ev-k">Elimination Rate Constant (k):</label>
+            <input type="number" id="ev-k" step="any">
+            <span>h<sup>-1</sup></span>
+        </div>
+        <div class="input-container">
+            <label for="ev-v">Volume of Distribution (V):</label>
+            <input type="number" id="ev-v" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="ev-tlag">Lag Time (t<sub>lag</sub>):</label>
+            <input type="number" id="ev-tlag" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="ev-time">Time Range (t):</label>
+            <input type="number" id="ev-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotOneCompartmentExtravascular()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="ev-plot" class="plot-container"></div>
+    </div>
+
+    <!-- Two-Compartment IV Bolus Model -->
+    <div id="two-compartment-iv-bolus" class="container">
+        <h2>IV Bolus Two-Compartment Model</h2>
+        <div class="input-container">
+            <label for="iv-bolus2-dose">Dose (D):</label>
+            <input type="number" id="iv-bolus2-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-interval">Dosing Interval (τ):</label>
+            <input type="number" id="iv-bolus2-interval" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-doses">Number of Doses (n):</label>
+            <input type="number" id="iv-bolus2-doses" step="any">
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-cl1">Distribution Clearance (CL<sub>1</sub>):</label>
+            <input type="number" id="iv-bolus2-cl1" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-v1">Central Compartment Volume (V<sub>1</sub>):</label>
+            <input type="number" id="iv-bolus2-v1" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-cl2">Reabsorption Clearance (CL<sub>2</sub>):</label>
+            <input type="number" id="iv-bolus2-cl2" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-v2">Peripheral Volume (V<sub>2</sub>):</label>
+            <input type="number" id="iv-bolus2-v2" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-bolus2-time">Time Range (t):</label>
+            <input type="number" id="iv-bolus2-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotTwoCompartmentIVBolus()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="iv-bolus2-plot" class="plot-container"></div>
+    </div>
+
+    <!-- Two-Compartment IV Infusion Model -->
+    <div id="two-compartment-iv-infusion" class="container">
+        <h2>IV Infusion Two-Compartment Model</h2>
+        <div class="input-container">
+            <label for="iv-infusion2-dose">Dose (D):</label>
+            <input type="number" id="iv-infusion2-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-time">Infusion Time (T<sub>inf</sub>):</label>
+            <input type="number" id="iv-infusion2-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-interval">Dosing Interval (τ):</label>
+            <input type="number" id="iv-infusion2-interval" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-doses">Number of Doses (n):</label>
+            <input type="number" id="iv-infusion2-doses" step="any">
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-cl1">Distribution Clearance (CL<sub>1</sub>):</label>
+            <input type="number" id="iv-infusion2-cl1" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-v1">Central Compartment Volume (V<sub>1</sub>):</label>
+            <input type="number" id="iv-infusion2-v1" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-cl2">Reabsorption Clearance (CL<sub>2</sub>):</label>
+            <input type="number" id="iv-infusion2-cl2" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-v2">Peripheral Volume (V<sub>2</sub>):</label>
+            <input type="number" id="iv-infusion2-v2" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="iv-infusion2-range">Time Range (t):</label>
+            <input type="number" id="iv-infusion2-range" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotTwoCompartmentIVInfusion()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="iv-infusion2-plot" class="plot-container"></div>
+    </div>
+
+    <!-- Two-Compartment Extravascular Model -->
+    <div id="two-compartment-extravascular" class="container">
+        <h2>Extravascular Two-Compartment Model</h2>
+        <div class="input-container">
+            <label for="extravascular2-dose">Dose (D):</label>
+            <input type="number" id="extravascular2-dose" step="any">
+            <span>ng</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-interval">Dosing Interval (τ):</label>
+            <input type="number" id="extravascular2-interval" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-doses">Number of Doses (n):</label>
+            <input type="number" id="extravascular2-doses" step="any">
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-ka">Absorption Rate Constant (k<sub>a</sub>):</label>
+            <input type="number" id="extravascular2-ka" step="any">
+            <span>h<sup>-1</sup></span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-cl1">Distribution Clearance (CL<sub>1</sub>):</label>
+            <input type="number" id="extravascular2-cl1" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-v1">Central Compartment Volume (V<sub>1</sub>):</label>
+            <input type="number" id="extravascular2-v1" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-cl2">Reabsorption Clearance (CL<sub>2</sub>):</label>
+            <input type="number" id="extravascular2-cl2" step="any">
+            <span>L/h</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-v2">Peripheral Volume (V<sub>2</sub>):</label>
+            <input type="number" id="extravascular2-v2" step="any">
+            <span>L</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-tlag">Lag Time (t<sub>lag</sub>):</label>
+            <input type="number" id="extravascular2-tlag" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container">
+            <label for="extravascular2-time">Time Range (t):</label>
+            <input type="number" id="extravascular2-time" step="any">
+            <span>h</span>
+        </div>
+        <div class="input-container" style="justify-content: center;">
+            <button class="plot-button" onclick="plotExtravascularTwoCompartmentModel()">Plot Concentration-Time Curve</button>
+        </div>
+        <div id="extravascular2-plot" class="plot-container"></div>
+    </div>
+
+    <script>
+        function showContainer(containerId) {
+            document.querySelectorAll('.container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById(containerId).style.display = 'flex';
+        }
+
+        // One-Compartment IV Bolus Model
+        function plotOneCompartmentIVBolus() {
+            const dose = parseFloat(document.getElementById('iv-bolus-dose').value);
+            const interval = parseFloat(document.getElementById('iv-bolus-interval').value);
+            const doses = parseFloat(document.getElementById('iv-bolus-doses').value);            
+            const k = parseFloat(document.getElementById('iv-bolus-k').value);
+            const v = parseFloat(document.getElementById('iv-bolus-v').value);
+            const timeRange = parseFloat(document.getElementById('iv-bolus-time').value);
+
+            if (isNaN(dose) || isNaN(interval) || isNaN(doses) || isNaN(k) || isNaN(v) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration=0;
+                for (let i=0; i < doses;i++){
+                    if(t>=i*interval) {
+                        concentration+=(dose/v)*Math.exp(-k*(t-i*interval));
+                    }
+                }
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'IV Bolus One-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('iv-bolus-plot', data, layout);
+        }
+
+        // One-Compartment IV Infusion Model
+        function plotOneCompartmentIVInfusion() {
+            const dose = parseFloat(document.getElementById('iv-infusion-dose').value);
+            const infusionTime = parseFloat(document.getElementById('iv-infusion-time').value);
+            const interval = parseFloat(document.getElementById('iv-infusion-interval').value);
+            const doses = parseFloat(document.getElementById('iv-infusion-doses').value);
+            const k = parseFloat(document.getElementById('iv-infusion-k').value);
+            const v = parseFloat(document.getElementById('iv-infusion-v').value);
+            const timeRange = parseFloat(document.getElementById('iv-infusion-range').value);
+
+            if (isNaN(dose) || isNaN(infusionTime) || isNaN(interval)  || isNaN(doses)|| isNaN(k) || isNaN(v) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const k0 = dose / infusionTime;
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration=0;
+                for (let i=0; i < doses; i++){
+                    let start_time=i*interval;
+                    if(t>=start_time){
+                        if (t <= start_time + infusionTime) {
+                            concentration += (k0 / (k * v)) * (1 - Math.exp(-k * (t - start_time)));
+                        } else {
+                            concentration += (k0 / (k * v)) * (1 - Math.exp(-k * infusionTime)) * Math.exp(-k * (t - start_time - infusionTime));
+                        } 
+                    }
+                }                
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'IV Infusion One-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('iv-infusion-plot', data, layout);
+        }
+
+        // Extravascular One-Compartment Model
+        function plotOneCompartmentExtravascular() {
+            const ka = parseFloat(document.getElementById('ev-ka').value);
+            const k = parseFloat(document.getElementById('ev-k').value);
+            const v = parseFloat(document.getElementById('ev-v').value);
+            const dose = parseFloat(document.getElementById('ev-dose').value);
+            const tlag = parseFloat(document.getElementById('ev-tlag').value);
+            const interval = parseFloat(document.getElementById('ev-interval').value);
+            const doses = parseFloat(document.getElementById('ev-doses').value);
+            const timeRange = parseFloat(document.getElementById('ev-time').value);
+
+            if (isNaN(ka) || isNaN(k) || isNaN(v) || isNaN(dose) || isNaN(tlag) || isNaN(interval) || isNaN(doses) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration = 0;
+                for (let i = 0; i < doses; i++) {
+                    let start_time = i * interval;
+                    if (t >= start_time + tlag) {
+                        concentration += (dose * ka / (v * (ka - k))) * (Math.exp(-k * (t - start_time - tlag)) - Math.exp(-ka * (t - start_time - tlag)));
+                    }
+                }
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'Extravascular One-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('ev-plot', data, layout);
+        }
+
+        // Two-Compartment IV Bolus Model
+        function plotTwoCompartmentIVBolus() {
+            const dose = parseFloat(document.getElementById('iv-bolus2-dose').value);
+            const interval = parseFloat(document.getElementById('iv-bolus2-interval').value);
+            const doses = parseFloat(document.getElementById('iv-bolus2-doses').value);
+            const cl1 = parseFloat(document.getElementById('iv-bolus2-cl1').value);
+            const v1 = parseFloat(document.getElementById('iv-bolus2-v1').value);
+            const cl2 = parseFloat(document.getElementById('iv-bolus2-cl2').value);
+            const v2 = parseFloat(document.getElementById('iv-bolus2-v2').value);
+            const timeRange = parseFloat(document.getElementById('iv-bolus2-time').value);
+
+            if (isNaN(cl1) || isNaN(v1) || isNaN(cl2) || isNaN(v2) || isNaN(dose) || isNaN(interval) || isNaN(doses) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const k10 = cl1 / v1;
+            const k12 = cl2 / v1;
+            const k21 = cl2 / v2;
+
+            const alpha = (k10 + k12 + k21 + Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+            const beta = (k10 + k12 + k21 - Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+
+            const A = (dose / v1) * (alpha-k21) / (alpha - beta);
+            const B = (dose / v1) * (k21 - beta) / (alpha - beta);
+
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration = 0;
+                for (let i = 0; i < doses; i++) {
+                    let start_time = i * interval;
+                    if (t >= start_time) {
+                        concentration += A * Math.exp(-alpha * (t - start_time)) + B * Math.exp(-beta * (t - start_time));
+                    }
+                }
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'IV Bolus Two-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('iv-bolus2-plot', data, layout);
+        }
+
+        // Two-Compartment IV Infusion Model
+        function plotTwoCompartmentIVInfusion() {
+            const dose = parseFloat(document.getElementById('iv-infusion2-dose').value);
+            const infusion_time = parseFloat(document.getElementById('iv-infusion2-time').value);
+            const interval = parseFloat(document.getElementById('iv-infusion2-interval').value);
+            const doses = parseFloat(document.getElementById('iv-infusion2-doses').value);
+            const cl1 = parseFloat(document.getElementById('iv-infusion2-cl1').value);
+            const v1 = parseFloat(document.getElementById('iv-infusion2-v1').value);
+            const cl2 = parseFloat(document.getElementById('iv-infusion2-cl2').value);
+            const v2 = parseFloat(document.getElementById('iv-infusion2-v2').value);
+            const timeRange = parseFloat(document.getElementById('iv-infusion2-range').value);
+
+            if (isNaN(cl1) || isNaN(v1) || isNaN(cl2) || isNaN(v2) || isNaN(dose) || isNaN(infusion_time) || isNaN(interval) || isNaN(doses) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const k0 = dose / infusion_time;
+            const k10 = cl1 / v1;
+            const k12 = cl2 / v1;
+            const k21 = cl2 / v2;
+
+            const alpha = (k10 + k12 + k21 + Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+            const beta = (k10 + k12 + k21 - Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+
+            const A = (k0 / v1) * (alpha-k21) / (alpha - beta);
+            const B = (k0 / v1) * (k21 - beta) / (alpha-beta);
+
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration = 0;
+                for (let i = 0; i < doses; i++) {
+                    let start_time = i * interval;
+                    if (t >= start_time) {
+                        if (t <= start_time + infusion_time) {
+                            concentration += (A * (1 - Math.exp(-alpha * (t - start_time)))/alpha + B * (1 - Math.exp(-beta * (t - start_time)))/beta);
+                        } else {
+                            concentration += (A * Math.exp(-alpha * (t - start_time - infusion_time)) * (1 - Math.exp(-alpha * infusion_time)) / alpha  + B * Math.exp(-beta * (t - start_time - infusion_time)) * (1 - Math.exp(-beta * infusion_time)) / beta);
+                        }
+                    }
+                }
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'IV Infusion Two-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('iv-infusion2-plot', data, layout);
+        }
+
+        // Two-Compartment Extravascular Model
+        function plotExtravascularTwoCompartmentModel() {
+            const dose = parseFloat(document.getElementById('extravascular2-dose').value);
+            const interval = parseFloat(document.getElementById('extravascular2-interval').value);
+            const doses = parseFloat(document.getElementById('extravascular2-doses').value);
+            const ka = parseFloat(document.getElementById('extravascular2-ka').value);
+            const cl1 = parseFloat(document.getElementById('extravascular2-cl1').value);
+            const v1 = parseFloat(document.getElementById('extravascular2-v1').value);
+            const cl2 = parseFloat(document.getElementById('extravascular2-cl2').value);
+            const v2 = parseFloat(document.getElementById('extravascular2-v2').value);
+            const tlag = parseFloat(document.getElementById('extravascular2-tlag').value);
+            const timeRange = parseFloat(document.getElementById('extravascular2-time').value);
+
+            if (isNaN(ka) || isNaN(cl1) || isNaN(v1) || isNaN(cl2) || isNaN(v2) || isNaN(dose) || isNaN(tlag) || isNaN(interval) || isNaN(doses) || isNaN(timeRange)) {
+                alert('Please enter valid values for all parameters.');
+                return;
+            }
+
+            const k10 = cl1 / v1;
+            const k12 = cl2 / v1;
+            const k21 = cl2 / v2;
+
+            const alpha = (k10 + k12 + k21 + Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+            const beta = (k10 + k12 + k21 - Math.sqrt((k10 + k12 + k21) ** 2 - 4 * k10 * k21)) / 2;
+
+            const A = (dose * ka*(k21-ka)/ (v1 * (alpha-ka) * (beta-ka)));
+            const B = (dose * ka*(k21-alpha) / (v1 * (ka - alpha) * (beta - alpha)));
+            const C = (dose * ka*(k21-beta) / (v1 * (ka - beta) * (alpha - beta)));
+
+            const times = [];
+            const concentrations = [];
+
+            for (let t = 0; t <= timeRange; t += 0.1) {
+                let concentration = 0;
+                for (let i = 0; i < doses; i++) {
+                    let start_time = i * interval;
+                    if (t >= start_time + tlag) {
+                        concentration += A * (Math.exp(-ka * (t - start_time - tlag))) + B * (Math.exp(-alpha * (t - start_time - tlag))) + C * (Math.exp(-beta * (t - start_time - tlag)));
+                    }
+                }
+                times.push(t);
+                concentrations.push(concentration);
+            }
+
+            const trace = {
+                x: times,
+                y: concentrations,
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Concentration-Time Curve'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                title: 'Extravascular Two-Compartment Model Concentration-Time Curve',
+                xaxis: { title: 'Time (h)' },
+                yaxis: { title: 'Concentration (ng/L)' }
+            };
+
+            Plotly.newPlot('extravascular2-plot', data, layout);
+        }
+
+        // Initially show the first model container
+        showContainer('one-compartment-iv-bolus');
+    </script>
+</body>
+</html>
